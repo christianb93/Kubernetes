@@ -52,7 +52,7 @@ clusterName = args.clusterName
 stackName = args.stackName
 instanceType = args.instanceType
 
-print("Creating cluster ", clusterName)
+print("working with cluster ", clusterName)
 print("Using CloudFormation stack ", stackName)
 
 ##########################################################################################
@@ -124,7 +124,7 @@ cloudFormation.create_stack(
   Parameters = params,
   Capabilities = ['CAPABILITY_IAM'])
 
-print("Submitted creation request, now waiting for completion")
+print("Submitted creation request for auto-scaling group stack, now waiting for completion")
 waiter = cloudFormation.get_waiter('stack_create_complete')
 waiter.wait(StackName=stackName)
 
