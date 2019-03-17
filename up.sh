@@ -5,7 +5,7 @@ python3 create_cluster.py
 #
 # and the nodes
 #
-python3 create_nodes.py  --instanceType=t3.micro
+python3 create_nodes.py  
 
 #
 # Install nginx ingress controller following the instructions on
