@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target : "/"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /tomcat
+        backend:
+          serviceName: tomcat-service
+          servicePort: 8080
+      - path: /alpine
+        backend: 
+          serviceName: alpine-service
+          servicePort: 8080
+
+
+
