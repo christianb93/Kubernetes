@@ -12,9 +12,9 @@ spec:
         backend:
           serviceName: tomcat-service
           servicePort: 8080
-      - path: /alpine
+      - path: /httpd
         backend: 
-          serviceName: alpine-service
+          serviceName: httpd-service
           servicePort: 8080
 
 
