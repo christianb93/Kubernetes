@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: alpine
+  name: httpd
 spec:
   selector:
     matchLabels:
-      app: alpine
+      app: httpd
   replicas: 2
   template:
     metadata:
       labels:
-        app: alpine
+        app: httpd
     spec:
       containers:
-        - name: alpine-ctr
+        - name: httpd-ctr
           image: httpd:alpine
 ---
 apiVersion: apps/v1
@@ -37,10 +37,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: alpine-service
+  name: httpd-service
 spec:
   selector:
-    app: alpine
+    app: httpd
   ports:
   - protocol: TCP
     port: 8080
