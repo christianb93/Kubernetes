@@ -5,7 +5,8 @@ python3 create_cluster.py
 #
 # and the nodes
 #
-python3 create_nodes.py  
+amiId=$(aws ec2 describe-images  --filters Name=name,Values=\*eks-node-1.11\* --query 'reverse(sort_by(Images, &CreationDate))[0].ImageId')
+python3 create_nodes.py --amiId=$amiId
 
 #
 # Install nginx ingress controller following the instructions on
