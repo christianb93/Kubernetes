@@ -12,6 +12,7 @@
 # --clusterName         name of the cluster, default myCluster                           #
 # --stackName           CloudFormation stack for VPC and security group, default eks-vpc #
 # --instanceType        used instance type, default t2.small                             #
+# --amiId               the AMI id to use                                                #
 #                                                                                        #
 # At this point, we use Kubernetes version 1.11                                          #
 ##########################################################################################
@@ -47,13 +48,21 @@ parser.add_argument("--instanceType",
                     help="Name of instance type we use")
 
 
+parser.add_argument("--amiId",
+                    type=str,
+                    default="ami-032ed5525d4df2de3",
+                    help="ID of AMI to use")
+
+
 args = parser.parse_args()
 clusterName = args.clusterName
 stackName = args.stackName
 instanceType = args.instanceType
+amiId=args.amiId
 
 print("working with cluster ", clusterName)
 print("Using CloudFormation stack ", stackName)
+print("Using AMI ID ", amiId)
 
 ##########################################################################################
 # Collect data                                                                           #
@@ -83,8 +92,6 @@ print("Found subnets: ", subnets)
 
 nodeGroupName = "eksNodeGroup"
 sshKeyPair = "eksNodeKey"
-# This AMI works for eu-central-1 with Kubernetes v1.11
-amiId = "ami-032ed5525d4df2de3"
 stackName = "eks-auto-scaling-group-" + clusterName
 templateURL = 'https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2019-02-11/amazon-eks-nodegroup.yaml'
 
@@ -117,7 +124,7 @@ params = [
   {'ParameterKey' : 'Subnets' , 
    'ParameterValue' : ",".join(subnets) },
 ]
-
+print("Params: ", params)
 cloudFormation.create_stack(
   StackName = stackName, 
   TemplateURL = templateURL,
