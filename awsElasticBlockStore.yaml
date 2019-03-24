@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-demo
+  namespace: default
+spec:
+  containers:
+  - name: ebs-demo-ctr
+    image: httpd:alpine
+    volumeMounts:
+      - mountPath: /test
+        name: test-volume
+  volumes:
+  - name: test-volume
+    awsElasticBlockStore: 
+      volumeID: vol-0eb2505d4b7d035cb
+  nodeSelector:
+    failure-domain.beta.kubernetes.io/zone: eu-central-1a
+    
