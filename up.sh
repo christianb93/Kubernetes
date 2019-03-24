@@ -29,10 +29,10 @@ aws ec2 authorize-security-group-ingress --group-id $SEC_GROUP_ID --port 22 --pr
 #
 NODE=0
 IP=$(aws ec2 describe-instances --filters Name=key-name,Values=eksNodeKey Name=instance-state-name,Values=running --output text --query Reservations[$NODE].Instances[0].PublicIpAddress)
-gnome-terminal -e "ssh -i ~/eksNodeKey.pem ec2-user@$IP" &
+gnome-terminal -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/eksNodeKey.pem ec2-user@$IP" &
 NODE=1
 IP=$(aws ec2 describe-instances --filters Name=key-name,Values=eksNodeKey Name=instance-state-name,Values=running --output text --query Reservations[$NODE].Instances[0].PublicIpAddress)
-gnome-terminal -e "ssh -i ~/eksNodeKey.pem ec2-user@$IP" &
+gnome-terminal -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/eksNodeKey.pem ec2-user@$IP" &
 
 
 
