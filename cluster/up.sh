@@ -29,7 +29,7 @@ aws ec2 authorize-security-group-ingress --group-id $SEC_GROUP_ID --port 22 --pr
 #
 for NODE in `seq 0 1`; 
 do 
-  echo "Creating SSH sessio for node $NODE" 
+  echo "Creating SSH session for node $NODE" 
   IP=$(aws ec2 describe-instances --filters Name=key-name,Values=eksNodeKey Name=instance-state-name,Values=running --output text --query Reservations[$NODE].Instances[0].PublicIpAddress)
   gnome-terminal -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/eksNodeKey.pem ec2-user@$IP" &
 done
