@@ -52,8 +52,9 @@ container = client.V1Container(
 # we include the volumes that we refer to in the container definition
 #
 pvcSource=client.V1PersistentVolumeClaimVolumeSource(claim_name="my-pvc")
+podVolume=client.V1Volume(name="my-volume",persistent_volume_claim=pvcSource)
 podSpec=client.V1PodSpec(containers=[container], 
-                         volumes=[client.V1Volume(name="my-volume",persistent_volume_claim=pvcSource)])
+                         volumes=[podVolume])
 
 #
 # Now finalize deployment with this data
