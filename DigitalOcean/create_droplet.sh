@@ -52,18 +52,17 @@ status=$(curl -s -X GET "https://api.digitalocean.com/v2/droplets/$id" \
 echo "Droplet is currently in status $status"
 done
 
-
-#
 # Get the first public IP address
 #
 ip=$(curl -s -X GET "https://api.digitalocean.com/v2/droplets/$id" \
         -H "Authorization: Bearer $bearerToken"\
-        -H "Content-Type: application/json" | jq -r '.droplet.networks[] | select(.[].type="public") | .[0].ip_address')
+        -H "Content-Type: application/json" | jq -r '.droplet.networks[] | select(.[].type="public")[0].ip_address')
 ip=$(echo $ip | awk '{print $1}')
 echo "Newly created droplet has public IP $ip"
 
 #
-# and ssh into it
+# and ssh into it. It appears that we have to wait a few seconds for the SSH daemon to come up
 #
-gnome-terminal -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/do_k8s root@$ip" &
+sleep 10
+gnome-terminal -e "ssh -v -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/do_k8s root@$ip" &
 
