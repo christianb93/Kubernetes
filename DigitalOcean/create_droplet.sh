@@ -1,17 +1,36 @@
-#############################################################
-# Create a droplet                                          #
-# We will use the following parameters                      #
-# name "myDroplet"                                          #
-# region "fra1"                                             #
-# size "s-1vcpu-1gb"                                        #
-# sshKeyName "do_k8s"                                       #
-#############################################################
+################################################################################
+# Create a droplet                                                             #
+# We will use the following defaults                                           #
+# name "myDroplet"                                                             #
+# region "fra1"                                                                #
+# size "s-1vcpu-1gb"                                                           #
+# sshKeyName "do_k8s"                                                          #
+# Usage:                                                                       #
+# ./create_droplet.sh -n <name> -r <region> -s <size> -k <keyname>  -t <token> #
+#####################################################################
 
 
 name="myDroplet"
 region="fra1"
 size="s-1vcpu-1gb"
 sshKeyName="do_k8s"
+
+
+#
+# Parse parameters
+#
+while getopts t:n:r:s:k:h option
+do
+  case "${option}"
+    in
+      n) name=${OPTARG};;
+      r) region=${OPTARG};;
+      s) size=${OPTARG};;
+      h) echo "Usage: ./create_droplet.sh -n <name> -r <region> -s <size> -k <keyname> -t <token>"; exit;;
+      k) sshKeyName=${OPTARG};;
+      t) bearerToken=${OPTARG};;
+  esac
+done
 
 echo "Creating droplet $name of type $size in region $region"
 echo "Using bearer token $bearerToken and ssh key $sshKeyName"
@@ -56,13 +75,9 @@ done
 #
 ip=$(curl -s -X GET "https://api.digitalocean.com/v2/droplets/$id" \
         -H "Authorization: Bearer $bearerToken"\
-        -H "Content-Type: application/json" | jq -r '.droplet.networks[] | select(.[].type="public")[0].ip_address')
+        -H "Content-Type: application/json" | jq -r '.droplet.networks.v4 | select(.[].type="public")[0].ip_address')
 ip=$(echo $ip | awk '{print $1}')
 echo "Newly created droplet has public IP $ip"
 
-#
-# and ssh into it. It appears that we have to wait a few seconds for the SSH daemon to come up
-#
-sleep 10
-gnome-terminal -e "ssh -v -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/.ssh/do_k8s root@$ip" &
+
 

@@ -1,7 +1,22 @@
 #############################################################
 # List all droplets                                         #
+# Add -l to get full JSON output                            ä
 #############################################################
 
+
+#
+# Parse parameters
+#
+longOutput=0
+while getopts t:hl option
+do
+  case "${option}"
+    in
+      h) echo "Usage: ./list_droplets.sh -t <token> , use -l to toggle full JSON output"; exit;;
+      t) bearerToken=${OPTARG};;
+      l) longOutput=1
+  esac
+done
 
 echo "Using bearer token $bearerToken"
 
@@ -15,6 +30,10 @@ all=$(curl -s -X GET "https://api.digitalocean.com/v2/droplets/" \
 	-H "Content-Type: application/json")
 count=$(echo $all | jq '.meta.total') 
 echo "Found $count droplets in total"
+if [ $longOutput -eq 1 ]; 
+then
+  echo $all | jq '.'
+fi
 
 i=0
 while [  $i -lt $count ]; do

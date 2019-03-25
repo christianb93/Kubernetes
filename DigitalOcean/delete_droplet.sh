@@ -2,8 +2,19 @@
 # Delete a droplet                                          #
 #############################################################
 
+#
+# Parse parameters
+#
+while getopts d:t:h option
+do
+  case "${option}"
+    in
+      h) echo "Usage: ./delete_droplet.sh -d <droplet-id> -t <token>"; exit;;
+      t) bearerToken=${OPTARG};;
+      d) dropletId=${OPTARG};;
+  esac
+done
 
-dropletId=$1
 echo "Deleting droplet with ID $dropletId"
 echo "Using bearer token $bearerToken"
 
