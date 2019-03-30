@@ -9,7 +9,7 @@
 ################################################################################
 
 
-name="myCluster"
+name="my-cluster"
 region="fra1"
 size="s-1vcpu-2gb"
 k8_version="1.13"
@@ -29,6 +29,11 @@ do
   esac
 done
 
+if [ "X$bearerToken" == "X" ]; 
+then
+  echo "No bearer token specified, either set environment variable bearerToken or use switch -t"
+  exit 1
+fi
 
 echo "Creating cluster $name with node size $size in region $region"
 echo "Using bearer token $bearerToken"
@@ -37,7 +42,10 @@ echo "Using bearer token $bearerToken"
 #
 # Get the Kubernetes version matching 1.11
 #
-version=$(curl -X GET "https://api.digitalocean.com/v2/kubernetes/options"\
+options=$(curl -s -X GET "https://api.digitalocean.com/v2/kubernetes/options"\
+                      -H "Content-Type: application/json"\
+                      -H "Authorization: Bearer $bearerToken")
+version=$(curl -s -X GET "https://api.digitalocean.com/v2/kubernetes/options"\
                       -H "Content-Type: application/json"\
                       -H "Authorization: Bearer $bearerToken" | jq -r ".options.versions[] | select(.kubernetes_version | contains(\"$k8_version\")).slug")
 echo "Using version $version"
@@ -46,18 +54,16 @@ echo "Using version $version"
 #
 # Assemble node pool
 #
-nodePool="{\"size\":\"$size\",\"count\":"2", \"name\":\"default-pool\"}"
+nodePool="{\"size\": \"$size\",\"count\": 2,\"name\": \"my-pool\"}"
 #
 # and full request body
 #
-body="{\"name\":\"$name\", \"region\":\"$region\", \"version\":\"$version\",\"node_pools\": [ $nodePool ]}"
-echo "Request body"
-echo $body | jq '.'
+body="{\"name\": \"$name\",\"region\": \"$region\",\"version\": \"$version\",\"node_pools\": [ $nodePool ]}"
 
 #
 # Post this
 #
-results=$(curl -X POST  "https://api.digitalocean.com/v2/kubernetes/clusters"\
+results=$(curl -s -X POST  "https://api.digitalocean.com/v2/kubernetes/clusters"\
                         -H "Content-Type: application/json"\
                         -H "Authorization: Bearer $bearerToken"\
                         -d "$body")
@@ -65,6 +71,14 @@ results=$(curl -X POST  "https://api.digitalocean.com/v2/kubernetes/clusters"\
 # Retrieve clusterId
 #
 clusterId=$(echo $results | jq -r '.kubernetes_cluster.id')
+
+if [ "$clusterId" == "null" ]; 
+then
+  echo "Something went wrong"
+  echo "Result: $results"
+  exit 1
+fi
+
 echo "Cluster $clusterId in creation"
 
 #
@@ -74,12 +88,12 @@ echo "Waiting for completion of request"
 status=X
 while [ "$status" != "running" ];
 do
-sleep 15
+sleep 20
 status=$(curl -s -X GET "https://api.digitalocean.com/v2/kubernetes/clusters/$clusterId" \
 	-H "Authorization: Bearer $bearerToken" \
 	-H "Content-Type: application/json" \
         | jq -r '.kubernetes_cluster.status.state')
-echo "Cluster is currently in status $status"
+echo "Cluster is in status $status"
 done
 
 
