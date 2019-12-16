@@ -20,7 +20,7 @@ import boto3
 import yaml
 import argparse
 from os.path import expanduser
-k8Version="1.11"
+k8Version="1.13"
 
 
 ##########################################################################################
